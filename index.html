@@ -540,6 +540,8 @@ body.revealed.has-music #music{ display:grid; animation:musicIn .6s var(--ease) 
 #Mehndi{background:linear-gradient(170deg,var(--green),var(--green-deep));}
 #Barat{background:linear-gradient(170deg,var(--maroon),var(--maroon-deep));}
 #walima{background:linear-gradient(170deg,#1d1d1d,#000);}
+/* fireworks canvas behind the Barat card content */
+#fireworks{position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none;}
 #walima h2{ -webkit-text-fill-color:initial; }
 #walima h2::after{display:none;}
 #walima .gold-rule{height:1px; width:60px; margin:18px auto 0; background:var(--gold-light);}
@@ -909,6 +911,7 @@ footer p.script{margin:0;}
 
 <!-- ============ Barat / BARAAT ============ -->
 <section id="Barat" class="panel">
+  <canvas id="fireworks" aria-hidden="true"></canvas>
   <svg class="ring-deco" viewBox="0 0 200 200"><circle cx="75" cy="100" r="46" fill="none" stroke="var(--gold-light)" stroke-width="6"/><circle cx="135" cy="100" r="46" fill="none" stroke="var(--gold-light)" stroke-width="6"/></svg>
   <div class="wrap framed io">
     <svg class="corner tl"><use href="#corner-motif"/></svg>
@@ -1081,6 +1084,69 @@ footer p.script{margin:0;}
         '</div>');
     });
   }
+
+  /* ---------- Barat fireworks: start when the card's doors open, pause when scrolled away ---------- */
+  (function(){
+    var sec = document.getElementById('Barat'), cv = document.getElementById('fireworks');
+    if (!sec || !cv || reduce || !('IntersectionObserver' in window) || !cv.getContext) return;
+    var ctx = cv.getContext('2d'), W = 0, H = 0, dpr = 1;
+    var rockets = [], sparks = [], running = false, raf = 0, nextLaunch = 0, startAt = 0;
+    var palette = ['#F6E09B','#E8C766','#ffffff','#ff9db1','#ffd27a','#ffb347'];
+    function size(){
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = sec.clientWidth; H = sec.clientHeight;
+      cv.width = W*dpr; cv.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    function launch(){
+      rockets.push({
+        x: W*(.12 + Math.random()*.76), y: H,
+        ty: H*(.12 + Math.random()*.35),
+        vy: -(5.5 + Math.random()*2), color: palette[(Math.random()*palette.length)|0]
+      });
+    }
+    function explode(r){
+      var n = 46 + (Math.random()*30|0), c2 = palette[(Math.random()*palette.length)|0], big = 2.4 + Math.random()*2.4;
+      for (var i=0;i<n;i++){
+        var a = Math.PI*2*i/n + Math.random()*.15, v = big*(.55 + Math.random()*.6);
+        sparks.push({x:r.x, y:r.y, vx:Math.cos(a)*v, vy:Math.sin(a)*v, life:1, decay:.011 + Math.random()*.008,
+                     color:(i%3===0 ? c2 : r.color), size:1.2 + Math.random()*1.4});
+      }
+    }
+    function frame(t){
+      if (!running) return;
+      /* fade the previous frame to leave short trails */
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.fillRect(0,0,W,H);
+      ctx.globalCompositeOperation = 'lighter';
+      if (t >= nextLaunch){ launch(); if (Math.random()<.35) launch(); nextLaunch = t + 650 + Math.random()*900; }
+      for (var i=rockets.length-1;i>=0;i--){
+        var r = rockets[i]; r.y += r.vy; r.vy *= .985;
+        ctx.fillStyle = r.color; ctx.beginPath(); ctx.arc(r.x, r.y, 2, 0, 6.283); ctx.fill();
+        if (r.y <= r.ty || r.vy > -1.2){ explode(r); rockets.splice(i,1); }
+      }
+      for (var j=sparks.length-1;j>=0;j--){
+        var p = sparks[j]; p.x += p.vx; p.y += p.vy; p.vx *= .985; p.vy = p.vy*.985 + .045; p.life -= p.decay;
+        if (p.life <= 0){ sparks.splice(j,1); continue; }
+        ctx.globalAlpha = Math.max(p.life,0); ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size*p.life + .3, 0, 6.283); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    }
+    function start(){
+      if (running) return; running = true; size();
+      nextLaunch = performance.now() + 900;           // wait for the card doors to swing open
+      raf = requestAnimationFrame(frame);
+    }
+    function stop(){
+      running = false; cancelAnimationFrame(raf); rockets.length = 0; sparks.length = 0;
+      ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height); ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) start(); else stop(); });
+    }, {threshold:.35}).observe(sec);
+    window.addEventListener('resize', function(){ if (running) size(); });
+  })();
 
   /* ---------- the sequence ---------- */
   var revealed = false;
