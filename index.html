@@ -537,6 +537,23 @@ body.revealed.has-music #music{ display:grid; animation:musicIn .6s var(--ease) 
 .flame{position:absolute; bottom:0; opacity:.5; animation:flicker 2.4s ease-in-out infinite;}
 @keyframes flicker{ 0%,100%{opacity:.35; transform:scaleY(1);} 50%{opacity:.6; transform:scaleY(1.08);} }
 
+/* dholak drummers (Mehndi) — hands strike when the card scrolls in */
+.dhol{ margin:-4px auto 14px; }
+.dhol .hand{ transform-box:fill-box; transform-origin:50% 100%; transform:translateY(-20px); }
+.dhol .ring{ transform-box:fill-box; transform-origin:center; opacity:0; }
+.dhol .note{ opacity:0; }
+.dhol.in .hand{ animation:dholHit .8s ease-in-out infinite; }
+.dhol.in .hand.b{ animation-delay:.4s; }
+.dhol.in .ring{ animation:dholRing .8s ease-out infinite; }
+.dhol.in .ring.b{ animation-delay:.4s; }
+.dhol.in .note{ animation:dholNote 3.2s ease-out infinite; }
+.dhol.in .drum{ animation:dholShake .4s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+@keyframes dholHit{ 0%,100%{ transform:translateY(-20px); } 22%{ transform:translateY(0); } 38%{ transform:translateY(-9px); } 52%{ transform:translateY(-3px);} 70%{ transform:translateY(-20px);} }
+@keyframes dholRing{ 0%,18%{ transform:scale(.3); opacity:0; } 22%{ transform:scale(.3); opacity:.9; } 70%{ transform:scale(2.1); opacity:0; } 100%{ transform:scale(2.1); opacity:0; } }
+@keyframes dholNote{ 0%{ transform:translateY(8px); opacity:0; } 15%{ opacity:1; } 100%{ transform:translateY(-34px); opacity:0; } }
+@keyframes dholShake{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(1.2px); } }
+@media (prefers-reduced-motion: reduce){ .dhol *{ animation:none !important; } .dhol .hand{ transform:translateY(-8px); } }
+
 #Mehndi{background:linear-gradient(170deg,var(--green),var(--green-deep));}
 #Barat{background:linear-gradient(170deg,var(--maroon),var(--maroon-deep));}
 #walima{background:linear-gradient(170deg,#1d1d1d,#000);}
@@ -889,6 +906,49 @@ footer p.script{margin:0;}
       </g>
       <path d="M70 140c-9-28-5-52 12-62 2 9-5 18-1 27 5-12 1-24 12-29 3 10-4 20 2 29 7-10 3-22 14-26 3 12-7 22-2 34 9-9 9-21 18-24 5 14-9 26-3 51H70z" fill="#E7B98B"/>
       <path class="henna-line" d="M86 128c0-18 9-30 9-44 5 9 2 19 9 24 3-9 0-18 7-23 2 10-3 18 2 26 5-7 3-16 10-20" fill="none" stroke="var(--maroon-deep)" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+    <svg class="scene dhol rv zoom" viewBox="0 0 220 124" width="210" height="118" aria-hidden="true">
+      <defs>
+        <clipPath id="dholBody"><path d="M50 66Q110 46 170 66V94Q110 114 50 94Z"/></clipPath>
+        <linearGradient id="dholWood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a45a25"/><stop offset=".5" stop-color="#7a3b16"/><stop offset="1" stop-color="#4a210b"/></linearGradient>
+      </defs>
+      <g fill="var(--gold-light)" font-family="Georgia,serif" font-size="16">
+        <text class="note" x="92" y="40">&#9834;</text>
+        <text class="note" x="112" y="34" style="animation-delay:1s">&#9835;</text>
+        <text class="note" x="132" y="40" style="animation-delay:2s">&#9834;</text>
+      </g>
+      <g class="drum">
+        <path d="M50 66Q110 46 170 66V94Q110 114 50 94Z" fill="url(#dholWood)" stroke="var(--gold-light)" stroke-width="1.6"/>
+        <g clip-path="url(#dholBody)" fill="none" stroke="var(--gold-light)" stroke-opacity=".85" stroke-width="1.4">
+          <path d="M56 40L68 124L80 40L92 124L104 40L116 124L128 40L140 124L152 40L164 124"/>
+        </g>
+        <ellipse cx="50" cy="80" rx="6.5" ry="14" fill="#F3E2BC" stroke="var(--gold-light)" stroke-width="1.5"/>
+        <ellipse cx="50" cy="80" rx="3" ry="7" fill="#3a1a0a"/>
+        <ellipse cx="170" cy="80" rx="6.5" ry="14" fill="#F3E2BC" stroke="var(--gold-light)" stroke-width="1.5"/>
+        <ellipse cx="170" cy="80" rx="3" ry="7" fill="#3a1a0a"/>
+      </g>
+      <circle class="ring" cx="66" cy="64" r="9" fill="none" stroke="var(--gold-light)" stroke-width="1.6"/>
+      <circle class="ring b" cx="154" cy="64" r="9" fill="none" stroke="var(--gold-light)" stroke-width="1.6"/>
+      <g transform="translate(66 60)">
+        <g class="hand a">
+          <rect x="-8" y="-62" width="16" height="36" rx="4" fill="#E7B98B"/>
+          <rect x="-9.5" y="-40" width="19" height="4" rx="2" fill="none" stroke="var(--gold-light)" stroke-width="1.6"/>
+          <rect x="-12" y="-30" width="24" height="20" rx="6" fill="#E7B98B"/>
+          <rect x="-12" y="-14" width="5.5" height="16" rx="2.7" fill="#E7B98B"/><rect x="-6" y="-14" width="5.5" height="17" rx="2.7" fill="#E7B98B"/>
+          <rect x="0.5" y="-14" width="5.5" height="17" rx="2.7" fill="#E7B98B"/><rect x="6.5" y="-14" width="5.5" height="16" rx="2.7" fill="#E7B98B"/>
+          <path d="M-12 -24l-6 8 5 3z" fill="#E7B98B"/>
+        </g>
+      </g>
+      <g transform="translate(154 60)">
+        <g class="hand b">
+          <rect x="-8" y="-62" width="16" height="36" rx="4" fill="#E7B98B"/>
+          <rect x="-9.5" y="-40" width="19" height="4" rx="2" fill="none" stroke="var(--gold-light)" stroke-width="1.6"/>
+          <rect x="-12" y="-30" width="24" height="20" rx="6" fill="#E7B98B"/>
+          <rect x="-12" y="-14" width="5.5" height="16" rx="2.7" fill="#E7B98B"/><rect x="-6" y="-14" width="5.5" height="17" rx="2.7" fill="#E7B98B"/>
+          <rect x="0.5" y="-14" width="5.5" height="17" rx="2.7" fill="#E7B98B"/><rect x="6.5" y="-14" width="5.5" height="16" rx="2.7" fill="#E7B98B"/>
+          <path d="M-12 -24l-6 8 5 3z" fill="#E7B98B"/>
+        </g>
+      </g>
     </svg>
     <p class="eyebrow rv" style="--d:.15;margin:0;">Celebration two</p>
     <h2 class="rv" style="--d:.25">Mehndi</h2>
