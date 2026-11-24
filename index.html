@@ -191,6 +191,17 @@ button{font:inherit;}
 }
 .tap span{background:rgba(18,4,10,.62); padding:6px 14px 6px 18px; border-radius:30px;}
 #intro.opening .tap{opacity:0; animation:none;}
+/* personalised guest name (set from ?to=… in the link) */
+.guest-intro{
+  position:absolute; left:0; right:0; top:calc(50% + 150px); z-index:4; text-align:center; padding:0 20px;
+  font-family:'Great Vibes',cursive; font-size:30px; line-height:1.25; color:var(--gold-light);
+  text-shadow:0 2px 10px rgba(0,0,0,.6); pointer-events:none; transition:opacity .4s ease;
+}
+.guest-intro small{display:block; font-family:'Cinzel',serif; font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:rgba(246,224,155,.75); margin-bottom:4px;}
+#intro.opening .guest-intro{opacity:0;}
+.guest-line{ margin:0 0 18px; }
+.guest-line small{display:block; font-family:'Cinzel',serif; font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:2px;}
+.guest-line b{display:block; font-family:'Great Vibes',cursive; font-weight:400; font-size:34px; line-height:1.25; color:var(--maroon);}
 @keyframes blink{0%,100%{opacity:.45;} 50%{opacity:1;}}
 
 #skip{
@@ -704,6 +715,7 @@ footer p.script{margin:0;}
   <div class="seam"></div>
   <button id="seal" type="button" aria-label="Open the invitation"><span>M</span><i>&amp;</i><span>U</span></button>
   <div class="tap"><span>Tap to open</span></div>
+  <div class="guest-intro" id="guestIntro" hidden><small>Invitation for</small><span></span></div>
   <button id="skip" type="button">Skip</button>
 </div>
 
@@ -749,6 +761,7 @@ footer p.script{margin:0;}
     </svg>
     <p class="hero-cap rv" style="--d:.9">your photo can go here — just send it over</p>
 
+    <p class="guest-line rv" id="guestLine" style="--d:.9" hidden><small>Dear</small><b></b></p>
     <p class="bismillah arabic rv" style="--d:1.0">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
     <p class="bismillah-sub rv" style="--d:1.15">in the name of Allah, the Most Gracious, the Most Merciful</p>
 
@@ -1108,6 +1121,24 @@ footer p.script{margin:0;}
     document.body.appendChild(layer);
     setTimeout(function(){ layer.remove(); }, 4200);
   }
+
+  /* ---------- personalised guest name: index.html?to=Musab%20Qureshi ---------- */
+  (function(){
+    try{
+      var q = new URLSearchParams(location.search);
+      var name = (q.get('to') || '').replace(/\s+/g,' ').trim().slice(0,80);
+      if (!name) return;
+      var as = (q.get('as') || 'family').toLowerCase();
+      var text = as === 'mr' ? 'Mr ' + name
+               : as === 'ms' ? 'Ms ' + name
+               : as === 'plain' ? name
+               : 'Mr & Mrs ' + name + ' with family';
+      var gi = document.getElementById('guestIntro'), gl = document.getElementById('guestLine');
+      gi.querySelector('span').textContent = text; gi.hidden = false;
+      gl.querySelector('b').textContent = text; gl.hidden = false;
+      document.title = 'Invitation for ' + text + ' — Dr Maryam & Umar';
+    }catch(e){}
+  })();
 
   /* ---------- background music ---------- */
   var bgm = document.getElementById('bgm'), musicBtn = document.getElementById('music');

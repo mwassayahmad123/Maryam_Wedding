@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Invitation link maker</title>
+<style>
+  :root{ --cream:#FBF3E4; --paper:#FFFDF8; --ink:#2B1810; --soft:#5B4636; --gold:#B8860B; --maroon:#5C1626; }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--cream); color:var(--ink); font:18px/1.5 Georgia,serif; padding:24px 16px 60px;}
+  main{max-width:640px; margin:0 auto;}
+  h1{font-size:26px; color:var(--maroon); margin:0 0 4px;}
+  p.sub{margin:0 0 22px; color:var(--soft); font-size:16px;}
+  label{display:block; font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); margin:16px 0 6px;}
+  textarea,select,input{width:100%; font:inherit; padding:11px 12px; border:1px solid #d9c9a8; border-radius:8px; background:var(--paper); color:var(--ink);}
+  textarea{min-height:120px; resize:vertical;}
+  .row{display:flex; gap:10px; flex-wrap:wrap;}
+  button,a.btn{font:inherit; font-size:15px; padding:9px 14px; border-radius:8px; border:1px solid var(--maroon); background:var(--maroon); color:#fff; cursor:pointer; text-decoration:none; display:inline-block;}
+  button.alt,a.btn.alt{background:transparent; color:var(--maroon);}
+  a.btn.wa{background:#1f9d55; border-color:#1f9d55;}
+  ul{list-style:none; padding:0; margin:22px 0 0;}
+  li{background:var(--paper); border:1px solid #e6d8b8; border-radius:10px; padding:12px 14px; margin-bottom:12px;}
+  li b{display:block; color:var(--maroon); margin-bottom:4px;}
+  li code{display:block; font:13px/1.4 Consolas,monospace; color:var(--soft); word-break:break-all; margin-bottom:10px;}
+  .hint{font-size:14px; color:var(--soft); margin-top:6px;}
+</style>
+</head>
+<body>
+<main>
+  <h1>Invitation link maker</h1>
+  <p class="sub">Har mehmaan ka naam likho (ek line mein ek naam). Unke liye alag link banega jis par card unke naam se khulega.</p>
+
+  <label for="names">Names (one per line)</label>
+  <textarea id="names" placeholder="Musab Qureshi&#10;Ahmed Raza&#10;Sana Khan"></textarea>
+
+  <label for="as">Card par kaise likha aaye</label>
+  <select id="as">
+    <option value="family">Mr &amp; Mrs &lt;name&gt; with family</option>
+    <option value="mr">Mr &lt;name&gt;</option>
+    <option value="ms">Ms &lt;name&gt;</option>
+    <option value="plain">&lt;name&gt; (jaisa likha waisa)</option>
+  </select>
+  <p class="hint">"Plain" mein poora text khud likh sakte ho, jaise <i>Chaudhry Family</i>.</p>
+
+  <ul id="out"></ul>
+</main>
+
+<script>
+(function(){
+  var names = document.getElementById('names'), as = document.getElementById('as'), out = document.getElementById('out');
+  var base = location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/, '') ;
+  function label(n){
+    var v = as.value;
+    return v==='mr' ? 'Mr '+n : v==='ms' ? 'Ms '+n : v==='plain' ? n : 'Mr & Mrs '+n+' with family';
+  }
+  function build(n){
+    return base + '?to=' + encodeURIComponent(n) + (as.value==='family' ? '' : '&as=' + as.value);
+  }
+  function render(){
+    out.innerHTML = '';
+    names.value.split('\n').map(function(s){return s.trim();}).filter(Boolean).forEach(function(n){
+      var link = build(n), li = document.createElement('li');
+      var b = document.createElement('b'); b.textContent = label(n);
+      var code = document.createElement('code'); code.textContent = link;
+      var row = document.createElement('div'); row.className = 'row';
+
+      var copy = document.createElement('button'); copy.type = 'button'; copy.textContent = 'Copy link';
+      copy.onclick = function(){
+        var done = function(){ copy.textContent = 'Copied ✓'; setTimeout(function(){ copy.textContent = 'Copy link'; }, 1500); };
+        if (navigator.clipboard) navigator.clipboard.writeText(link).then(done, function(){ prompt('Copy:', link); });
+        else prompt('Copy:', link);
+      };
+      var msg = 'Assalam o Alaikum ' + label(n) + ',\nAap ko Dr Maryam & Umar ki shadi mein shirkat ki dawat hai. Card yahan dekhein:\n' + link;
+      var wa = document.createElement('a'); wa.className = 'btn wa'; wa.target = '_blank'; wa.rel = 'noopener';
+      wa.href = 'https://wa.me/?text=' + encodeURIComponent(msg); wa.textContent = 'WhatsApp';
+      var view = document.createElement('a'); view.className = 'btn alt'; view.target = '_blank'; view.rel = 'noopener';
+      view.href = link; view.textContent = 'Preview';
+
+      row.appendChild(copy); row.appendChild(wa); row.appendChild(view);
+      li.appendChild(b); li.appendChild(code); li.appendChild(row); out.appendChild(li);
+    });
+  }
+  names.addEventListener('input', render); as.addEventListener('change', render);
+})();
+</script>
+</body>
+</html>
