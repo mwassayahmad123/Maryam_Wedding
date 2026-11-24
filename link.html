@@ -29,19 +29,19 @@
 <body>
 <main>
   <h1>Invitation link maker</h1>
-  <p class="sub">Har mehmaan ka naam likho (ek line mein ek naam). Unke liye alag link banega jis par card unke naam se khulega.</p>
+  <p class="sub">Type each guest's name (one per line). Every guest gets their own link, and the invitation opens with their name on it.</p>
 
   <label for="names">Names (one per line)</label>
   <textarea id="names" placeholder="Musab Qureshi&#10;Ahmed Raza&#10;Sana Khan"></textarea>
 
-  <label for="as">Card par kaise likha aaye</label>
+  <label for="as">How the name appears on the card</label>
   <select id="as">
     <option value="family">Mr &amp; Mrs &lt;name&gt; with family</option>
     <option value="mr">Mr &lt;name&gt;</option>
     <option value="ms">Ms &lt;name&gt;</option>
-    <option value="plain">&lt;name&gt; (jaisa likha waisa)</option>
+    <option value="plain">&lt;name&gt; (exactly as typed)</option>
   </select>
-  <p class="hint">"Plain" mein poora text khud likh sakte ho, jaise <i>Chaudhry Family</i>.</p>
+  <p class="hint">With "exactly as typed" you can write the whole line yourself, e.g. <i>The Chaudhry Family</i>.</p>
 
   <ul id="out"></ul>
 </main>
@@ -71,7 +71,7 @@
         if (navigator.clipboard) navigator.clipboard.writeText(link).then(done, function(){ prompt('Copy:', link); });
         else prompt('Copy:', link);
       };
-      var msg = 'Assalam o Alaikum ' + label(n) + ',\nAap ko Dr Maryam & Umar ki shadi mein shirkat ki dawat hai. Card yahan dekhein:\n' + link;
+      var msg = 'Assalamu Alaikum ' + label(n) + ',\nYou are warmly invited to the wedding of Dr Maryam & Umar. View your invitation here:\n' + link;
       var wa = document.createElement('a'); wa.className = 'btn wa'; wa.target = '_blank'; wa.rel = 'noopener';
       wa.href = 'https://wa.me/?text=' + encodeURIComponent(msg); wa.textContent = 'WhatsApp';
       var view = document.createElement('a'); view.className = 'btn alt'; view.target = '_blank'; view.rel = 'noopener';
