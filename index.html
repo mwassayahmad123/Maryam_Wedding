@@ -343,6 +343,27 @@ body.revealed .ripple.r3{ animation-delay:1s; }
   100%{ transform:scale(34); opacity:0;  border-width:1px; }
 }
 
+/* music toggle (only appears once music.mp3 has actually loaded) */
+#music{
+  position:fixed; left:16px; bottom:calc(16px + env(safe-area-inset-bottom)); z-index:60;
+  width:46px; height:46px; padding:0; border-radius:50%; cursor:pointer;
+  display:none; place-items:center;
+  color:var(--gold-light); background:rgba(58,14,24,.9);
+  border:1px solid var(--gold);
+  box-shadow:0 6px 20px -6px rgba(0,0,0,.5);
+  -webkit-tap-highlight-color:transparent;
+}
+body.revealed.has-music #music{ display:grid; animation:musicIn .6s var(--ease) both; }
+@keyframes musicIn{ from{ opacity:0; transform:scale(.6);} to{ opacity:1; transform:none;} }
+#music .slash{ display:none; }
+#music:not(.playing) .slash{ display:block; }
+#music:not(.playing) .waves{ display:none; }
+#music.playing::after{
+  content:""; position:absolute; inset:-1px; border-radius:50%;
+  border:1px solid var(--gold-light); animation:musicPulse 2s ease-out infinite; pointer-events:none;
+}
+@keyframes musicPulse{ from{ transform:scale(1); opacity:.8;} to{ transform:scale(1.7); opacity:0;} }
+
 /* flash + gold petal burst when the doors are wide open */
 #burst{ position:fixed; inset:0; z-index:101; pointer-events:none; overflow:hidden; }
 #burst .flash{
@@ -688,6 +709,16 @@ footer p.script{margin:0;}
 
 <div id="progress" aria-hidden="true"></div>
 <div id="petals" aria-hidden="true"></div>
+
+<!-- background music: drop a file called music.mp3 next to this page. No file = no player, nothing breaks. -->
+<audio id="bgm" src="music.mp3" loop preload="auto"></audio>
+<button id="music" type="button" aria-label="Toggle background music" title="Music">
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor" fill-opacity=".25"/>
+    <g class="waves"><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></g>
+    <path class="slash" d="M16 9l5 6M21 9l-5 6"/>
+  </svg>
+</button>
 
 <!-- ============ HERO ============ -->
 <section id="hero">
@@ -1078,9 +1109,59 @@ footer p.script{margin:0;}
     setTimeout(function(){ layer.remove(); }, 4200);
   }
 
+  /* ---------- background music ---------- */
+  var bgm = document.getElementById('bgm'), musicBtn = document.getElementById('music');
+  var wantMusic = true, fadeT, MAX_VOL = .6;
+  function markLoaded(){ document.body.classList.add('has-music'); }
+  if (bgm.readyState >= 2) markLoaded();
+  bgm.addEventListener('canplay', markLoaded);
+  bgm.addEventListener('error', function(){ document.body.classList.remove('has-music'); }); // no file → no button
+
+  function fade(to, ms, done){
+    clearInterval(fadeT);
+    var from = bgm.volume, i = 0, steps = 20;
+    fadeT = setInterval(function(){
+      i++; bgm.volume = Math.max(0, Math.min(1, from + (to - from) * i / steps));
+      if (i >= steps){ clearInterval(fadeT); if (done) done(); }
+    }, ms / steps);
+  }
+  function startMusic(){
+    if (!wantMusic || !bgm.paused) return;
+    bgm.volume = 0;
+    var p = bgm.play();
+    var ok = function(){ musicBtn.classList.add('playing'); fade(MAX_VOL, 2500); };
+    if (p && p.then){
+      p.then(ok).catch(function(){ armGesture(); });   // autoplay blocked (doors opened by timer) → wait for first tap
+    } else ok();
+  }
+  function stopMusic(){
+    musicBtn.classList.remove('playing');
+    fade(0, 600, function(){ bgm.pause(); });
+  }
+  var gestureEvents = ['pointerdown','keydown','touchend'];
+  function onFirstGesture(){
+    gestureEvents.forEach(function(ev){ window.removeEventListener(ev, onFirstGesture); });
+    startMusic();
+  }
+  function armGesture(){
+    gestureEvents.forEach(function(ev){ window.addEventListener(ev, onFirstGesture, {passive:true}); });
+  }
+  musicBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    gestureEvents.forEach(function(ev){ window.removeEventListener(ev, onFirstGesture); });
+    if (bgm.paused){ wantMusic = true; startMusic(); }
+    else { wantMusic = false; stopMusic(); }
+  });
+  var wasPlaying = false;
+  document.addEventListener('visibilitychange', function(){        // pause when the tab is hidden
+    if (document.hidden){ wasPlaying = !bgm.paused; if (wasPlaying) bgm.pause(); }
+    else if (wasPlaying && wantMusic){ bgm.play().catch(function(){}); }
+  });
+
   var opened = false;
   function openDoors(){
     if (opened) return; opened = true;
+    startMusic();
     timers.forEach(clearTimeout);
     intro.classList.add('opening');                                           // seal melts, light cracks through the seam
     timers.push(setTimeout(function(){ intro.classList.add('open'); }, 500));  // doors swing, camera pushes in
@@ -1088,7 +1169,8 @@ footer p.script{margin:0;}
     timers.push(setTimeout(function(){ intro.classList.add('fade'); reveal(); }, 3000)); // light dissolves, card flies in
     timers.push(setTimeout(function(){ intro.classList.add('gone'); }, 4200));
   }
-  function skipIntro(){
+  function skipIntro(e){
+    if (e && e.type === 'click') startMusic();   // only when the visitor actually tapped Skip
     opened = true; timers.forEach(clearTimeout);
     intro.classList.add('gone');
     reveal();
