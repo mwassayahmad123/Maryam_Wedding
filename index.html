@@ -523,6 +523,16 @@ body.revealed.has-music #music{ display:grid; animation:musicIn .6s var(--ease) 
   font-size:18px;
 }
 .venue .eyebrow{display:block; margin-bottom:6px;}
+/* "Get directions" button — opens the venue in Google Maps */
+.map-btn{
+  display:flex; width:max-content; max-width:100%; align-items:center; gap:8px; margin:16px auto 0; padding:11px 22px;
+  border-radius:30px; background:var(--gold-light); color:#3A0E18; text-decoration:none;
+  font-family:'Cinzel',serif; font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  box-shadow:0 8px 22px -10px rgba(0,0,0,.6); transition:transform .25s, filter .25s;
+}
+.map-btn:hover{ transform:translateY(-2px); filter:brightness(1.08); }
+.map-btn svg{ width:16px; height:16px; flex:none; }
+
 .copy-btn{
   margin-top:26px; display:inline-flex; align-items:center; gap:8px;
   background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.5);
@@ -1103,6 +1113,10 @@ footer p.script{margin:0;}
       <span class="eyebrow">Venue</span>
       Royal Garden Marque, Layyah
     </div>
+    <a class="map-btn rv" style="--d:.8" href="https://share.google/8fC5Fuemljkq24gsU" target="_blank" rel="noopener" aria-label="Open Royal Garden Marquee location in Google Maps">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s-7-6.4-7-12a7 7 0 0 1 14 0c0 5.6-7 12-7 12z"/><circle cx="12" cy="10" r="2.6"/></svg>
+      Get directions
+    </a>
     <button class="copy-btn rv" style="--d:.85" data-copy="Barat &amp; Wedding Reception — Friday, 04 December 2026 — Arrival of Barat with Fauji band 6:00 PM, Dinner 7:00 PM, Rukhsati 9:00 PM — Royal Garden Marque, Layyah">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="12" height="12" rx="1.5"/><path d="M5 16V5a1 1 0 0 1 1-1h11"/></svg>
       copy details
@@ -1142,6 +1156,10 @@ footer p.script{margin:0;}
       <span class="eyebrow">Venue</span>
       Royal Garden Marquee, Chowk Azam Road, Layyah
     </div>
+    <a class="map-btn rv" style="--d:.75" href="https://share.google/8fC5Fuemljkq24gsU" target="_blank" rel="noopener" aria-label="Open Royal Garden Marquee location in Google Maps">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s-7-6.4-7-12a7 7 0 0 1 14 0c0 5.6-7 12-7 12z"/><circle cx="12" cy="10" r="2.6"/></svg>
+      Get directions
+    </a>
     <button class="copy-btn rv" style="--d:.8" data-copy="Walima &amp; Reception — Saturday, 05 December 2026 — Reception of Guests 7:00 PM, Dinner 8:00 PM — Royal Garden Marquee, Chowk Azam Road, Layyah">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="12" height="12" rx="1.5"/><path d="M5 16V5a1 1 0 0 1 1-1h11"/></svg>
       copy details
