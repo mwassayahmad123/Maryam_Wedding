@@ -9,6 +9,8 @@
   (function(){
     var r = document.documentElement;
     r.classList.add('js','locked');
+    // Barat-only invitation: index.html?only=barat
+    if (/[?&]only=barat(&|$)/i.test(location.search)) r.classList.add('only-barat');
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) r.classList.add('rm');
   })();
 </script>
@@ -191,6 +193,9 @@ button{font:inherit;}
 }
 .tap span{background:rgba(18,4,10,.62); padding:6px 14px 6px 18px; border-radius:30px;}
 #intro.opening .tap{opacity:0; animation:none;}
+/* Barat-only invitation (?only=barat): hide the other celebrations */
+.only-barat #haldi, .only-barat #Mehndi, .only-barat #walima,
+.only-barat #overview, .only-barat .walima-contact{ display:none !important; }
 /* personalised guest name (set from ?to=… in the link) */
 .guest-intro{
   position:absolute; left:0; right:0; top:calc(50% + 150px); z-index:4; text-align:center; padding:0 20px;
@@ -726,7 +731,7 @@ footer p.script{margin:0;}
 
       <text x="200" y="560" text-anchor="middle" font-family="Cinzel, serif" font-size="12" letter-spacing="7" fill="#E8C766">WEDDING INVITATION</text>
       <text x="200" y="606" text-anchor="middle" font-family="'Great Vibes', cursive" font-size="40" fill="#F6E09B">Dr Maryam &amp; Umar</text>
-      <text x="200" y="634" text-anchor="middle" font-family="Cinzel, serif" font-size="10.5" letter-spacing="5" fill="#E8C766" fill-opacity=".85">01 – 05 DECEMBER 2026</text>
+      <text x="200" y="634" text-anchor="middle" font-family="Cinzel, serif" font-size="10.5" letter-spacing="5" fill="#E8C766" fill-opacity=".85" id="door-date">01 – 05 DECEMBER 2026</text>
 
       <g fill="none" stroke="url(#foil)" stroke-width="1.4">
         <rect x="78" y="664" width="92" height="120" rx="2"/>
@@ -1158,7 +1163,7 @@ footer p.script{margin:0;}
       <a href="tel:03008760104">0300-8760104</a>
       <a href="tel:03027838483">0302-7838483</a>
       <a href="tel:03037084623">0303-7084625</a>
-      <a href="tel:03006602020">0300-6602020 <span style="color:var(--ink-soft); font-size:14px;">(Walima)</span></a>
+      <a class="walima-contact" href="tel:03006602020">0300-6602020 <span style="color:var(--ink-soft); font-size:14px;">(Walima)</span></a>
     </div>
     <p class="hosts rv" style="--d:.4">All family members, relatives &amp; friends are warmly invited.</p>
   </div>
@@ -1344,6 +1349,16 @@ footer p.script{margin:0;}
     setTimeout(function(){ layer.remove(); }, 4200);
   }
 
+  /* ---------- Barat-only wording ---------- */
+  if (root.classList.contains('only-barat')){
+    document.getElementById('door-date').textContent = '04 DECEMBER 2026';
+    document.querySelector('.date-range').textContent = '04 December 2026 · Layyah, Pakistan';
+    var line = document.querySelector('.invite-line');
+    line.textContent = line.textContent.replace('wedding festivities', 'Barat & wedding reception');
+    document.querySelector('.scroll-cue').firstChild.textContent = 'the wedding day ';
+    document.querySelector('#Barat .eyebrow').textContent = 'The wedding';
+  }
+
   /* ---------- personalised guest name: index.html?to=Musab%20Qureshi ---------- */
   (function(){
     try{
@@ -1482,6 +1497,9 @@ footer p.script{margin:0;}
       {id:'Barat',   name:'Barat & wedding reception', at:'2026-12-04T18:00:00+05:00'},
       {id:'walima',  name:'Walima & reception',          at:'2026-12-05T19:00:00+05:00'}
     ].map(function(e){ e.at = new Date(e.at); return e; });
+    if (document.documentElement.classList.contains('only-barat')){
+      events = events.filter(function(e){ return e.id === 'Barat'; });
+    }
 
     var labelEl = document.getElementById('cd-label');
     var titleEl = document.getElementById('cd-title');
